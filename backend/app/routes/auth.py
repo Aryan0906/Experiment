@@ -8,19 +8,17 @@ from app.config import settings
 router = APIRouter()
 
 @router.get("/authorize")
-async def authorize_shopify() -> RedirectResponse:
+async def authorize_shopify(shop: str = "myshop.myshopify.com") -> RedirectResponse:
     """
     Redirects the user to the Shopify OAuth consent screen.
     Since this is Sprint 1 (Mock implementation), we redirect to a mock consent URL.
     """
-    # Mocking the redirect URL for testing purposes
-    shop_domain = "myshop.myshopify.com"
     redirect_uri = settings.shopify_redirect_uri
     client_id = settings.shopify_api_key
 
     # Standard Shopify OAuth URL format
     auth_url = (
-        f"https://{shop_domain}/admin/oauth/authorize?"
+        f"https://{shop}/admin/oauth/authorize?"
         f"client_id={client_id}&scope=read_products&redirect_uri={redirect_uri}"
     )
 
@@ -48,6 +46,5 @@ async def shopify_callback(code: str, shop: str, db: Session = Depends(get_db)) 
     seller.refresh_token = mock_refresh_token
     db.commit()
 
-    # Redirect to the frontend dashboard
-    # The actual dashboard URL should come from settings, but for mock purposes we use /dashboard
-    return RedirectResponse(url="http://localhost:3000/dashboard")
+    # Redirect to the frontend dashboard (Vite is running on 5173)
+    return RedirectResponse(url="http://localhost:5173/dashboard")
