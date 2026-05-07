@@ -8,8 +8,10 @@ class Settings(BaseSettings):
     shopify_api_key: str = os.getenv("SHOPIFY_API_KEY", "")
     shopify_api_secret: str = os.getenv("SHOPIFY_API_SECRET", "")
     shopify_redirect_uri: str = os.getenv(
-        "SHOPIFY_REDIRECT_URI", "http://localhost:3000/auth/callback"
+        "SHOPIFY_REDIRECT_URI", "http://localhost:8000/auth/shopify/callback"
     )
+    extraction_backend: str = os.getenv("EXTRACTION_BACKEND", "mock")
+    openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
 
     model_config = SettingsConfigDict(env_file=".env")
 

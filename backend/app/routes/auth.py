@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse
 from app.database import get_db
 from app.models import Seller
 from app.config import settings
+import httpx
 
 router = APIRouter()
 
@@ -11,7 +12,6 @@ router = APIRouter()
 async def authorize_shopify(shop: str = "myshop.myshopify.com") -> RedirectResponse:
     """
     Redirects the user to the Shopify OAuth consent screen.
-    Since this is Sprint 1 (Mock implementation), we redirect to a mock consent URL.
     """
     redirect_uri = settings.shopify_redirect_uri
     client_id = settings.shopify_api_key
@@ -29,11 +29,29 @@ async def shopify_callback(code: str, shop: str, db: Session = Depends(get_db)) 
     """
     Handles the OAuth callback from Shopify, exchanges the code for tokens,
     and stores the seller in the database.
-    In Sprint 1, this mocks the token exchange.
     """
-    # Mock token exchange
-    mock_access_token = f"mock_access_{code}"
-    mock_refresh_token = f"mock_refresh_{code}"
+    client_id = settings.shopify_api_key
+    client_secret = settings.shopify_api_secret
+
+    token_url = f"https://{shop}/admin/oauth/access_token"
+    payload = {
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "code": code
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(token_url, json=payload)
+        
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail=f"Failed to exchange token with Shopify: {response.text}")
+            
+        data = response.json()
+        access_token = data.get("access_token")
+        if not access_token:
+            raise HTTPException(status_code=400, detail="Shopify response did not contain an access_token")
+            
+        refresh_token = data.get("refresh_token", "")
 
     # Check if seller exists, otherwise create
     seller = db.query(Seller).filter_by(shop=shop).first()
@@ -42,9 +60,10 @@ async def shopify_callback(code: str, shop: str, db: Session = Depends(get_db)) 
         db.add(seller)
 
     # Update tokens
-    seller.access_token = mock_access_token
-    seller.refresh_token = mock_refresh_token
+    seller.access_token = access_token
+    seller.refresh_token = refresh_token
     db.commit()
 
     # Redirect to the frontend dashboard (Vite is running on 5173)
-    return RedirectResponse(url="http://localhost:5173/dashboard")
+    # Adding the shop parameter so the frontend knows who logged in
+    return RedirectResponse(url=f"http://localhost:5173/dashboard?shop={shop}")
