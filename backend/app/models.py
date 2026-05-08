@@ -19,6 +19,16 @@ class Seller(Base):
     jobs: Mapped[List["ExtractionJob"]] = relationship("ExtractionJob", back_populates="seller")
 
 
+class OAuthSession(Base):
+    """OAuthSession model for storing temporary OAuth state tokens."""
+    __tablename__ = "oauth_sessions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    shop = Column(String, index=True)  # Shopify shop domain
+    state = Column(String, unique=True, index=True)  # State token from OAuth flow
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
 class Product(Base):
     """Product model for representing Shopify products."""
     __tablename__ = "products"

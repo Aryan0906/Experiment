@@ -38,6 +38,7 @@ async def run_extraction_job(job_id: str) -> None:
         extractor = get_extractor(
             backend=settings.extraction_backend,
             api_key=settings.openai_api_key,
+            model_path=settings.fine_tuned_model_path,
         )
 
         total = len(products)

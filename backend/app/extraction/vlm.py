@@ -138,8 +138,13 @@ class GPT4VisionExtractor(AttributeExtractor):
             return attrs
 
 
-def get_extractor(backend: str = "mock", api_key: str = "") -> AttributeExtractor:
+def get_extractor(backend: str = "mock", api_key: str = "", model_path: str = "") -> AttributeExtractor:
     """Factory function to get the configured extractor."""
     if backend == "gpt4v" and api_key:
         return GPT4VisionExtractor(api_key=api_key)
+    if backend == "local_vlm" and model_path:
+        # Placeholder for future fine-tuned VLM integration
+        # Once implemented, this will load your fine-tuned model weights
+        # from the specified model_path
+        return MockExtractor()
     return MockExtractor()
