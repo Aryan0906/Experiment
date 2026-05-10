@@ -1,47 +1,50 @@
-# Python virtual environments
-env/
-venv/
-.venv/
-venv_training/
+```
+# Database
+*.db
 
-# Environment variable files
+# Dependencies
+node_modules/
+
+# Environment
 .env
-.env.*
+.env.local
+*.env.*
 
-# Ignore image assets
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.webp
-*.bmp
-*.tif
-*.tiff
-*.svg
-*.ico
+# Editors
+.vscode/
+.idea/
 
-# Ignore Markdown files
-*.md
-
-# Ignore JSON labels only in train and test splits
-data/train/*.json
-data/test/*.json
-data/val/*.json
-
-# Python cache and bytecode
+# Python
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.ENV
+.python-version
 
-# Local databases and logs
-*.db
-logs/
+# Build artifacts
+dist/
+build/
+*.egg-info/
+.coverage
+htmlcov/
+.coverage.*
+.nyc_output/
+coverage-final.json
 
-# Local editor settings
-.vscode/
+# Logs
+*.log
 
-# Local Python bootstrap/install artifacts
-python311_embed/
-python-*.exe
-python-*.zip
-get-pip.py
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+```

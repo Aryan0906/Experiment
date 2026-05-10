@@ -159,15 +159,17 @@ async def shopify_callback(
                 refresh_token=mock_refresh_token,
             )
             db.add(seller)
-            logger.info(f"Created new seller: {shop}")
+            db.commit()
+            seller_id = seller.id
+            logger.info(f"Created new seller: {shop} with ID {seller_id}")
         else:
             seller.access_token = mock_access_token
             seller.refresh_token = mock_refresh_token
-            logger.info(f"Updated existing seller: {shop}")
+            db.commit()
+            seller_id = seller.id
+            logger.info(f"Updated existing seller: {shop} with ID {seller_id}")
         
-        db.commit()
-        
-        # Redirect to frontend dashboard
+        # Redirect to frontend dashboard with shop parameter
         return RedirectResponse(
             url=f"http://localhost:5173/dashboard?shop={shop}",
             status_code=302
@@ -179,4 +181,28 @@ async def shopify_callback(
             url="http://localhost:5173/login?error=callback_failed",
             status_code=302
         )
+
+
+@router.get("/seller")
+async def get_seller(
+    shop: str,
+    db: Session = Depends(get_db),
+):
+    """
+    Get seller ID by shop domain.
+    
+    Used by frontend to fetch the correct seller_id for API calls.
+    
+    Args:
+        shop: Shopify shop domain
+        db: Database session
+    
+    Returns:
+        JSON with seller_id or error
+    """
+    seller = db.query(Seller).filter_by(shop=shop).first()
+    if not seller:
+        return {"seller_id": None, "error": "Seller not found"}
+    
+    return {"seller_id": seller.id, "shop": seller.shop}
 
