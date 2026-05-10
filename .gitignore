@@ -19,12 +19,21 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.pyw
 .Python
 env/
 venv/
 .venv/
 .ENV
 .python-version
+*.egg
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.pytest_cache/
+python311_embed/
+python3*/
 
 # Build artifacts
 dist/
@@ -38,6 +47,20 @@ coverage-final.json
 
 # Logs
 *.log
+events.out.tfevents.*
+runs/
+tensorboard/
+
+# Markdown files
+*.md
+
+# Data files
+data/test/*.json
+data/train/*.json
+data/val/*.json
+
+# Image files
+*.jpg
 
 # OS generated files
 .DS_Store
