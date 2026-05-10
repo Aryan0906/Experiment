@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse
 from urllib.parse import urlencode
 
-from app.database import get_db
-from app.models import Seller, OAuthSession
-from app.config import settings
+from ..database import get_db
+from ..models import Seller, OAuthSession
+from ..config import settings
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

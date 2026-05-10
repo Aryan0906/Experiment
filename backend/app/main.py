@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database import Base, engine
-from app.routes import auth
+from .database import Base, engine
+from .routes import auth, products, extract
 
 # Create all tables on startup
 Base.metadata.create_all(bind=engine)
@@ -26,7 +26,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include all routers
 app.include_router(auth.router, prefix="/auth/shopify", tags=["auth"])
+app.include_router(products.router, prefix="/api/products", tags=["products"])
+app.include_router(extract.router, prefix="/api", tags=["extraction"])
 
 @app.get("/health")
 async def health_check() -> dict[str, str]:

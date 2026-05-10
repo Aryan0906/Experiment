@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app.models import Seller, Product
+from ..database import get_db
+from ..models import Seller, Product
 import httpx
 import csv
 import io
@@ -99,7 +99,7 @@ async def download_csv(seller_id: int, db: Session = Depends(get_db)):
     Returns products + extracted attributes for the seller as a CSV download.
     Includes: product_id, title, brand, color, size, material, category, price, sku, confidence
     """
-    from app.models import ExtractedAttribute as EA
+    from ..models import ExtractedAttribute as EA
 
     seller = db.query(Seller).filter_by(id=seller_id).first()
     if not seller:

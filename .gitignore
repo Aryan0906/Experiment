@@ -1,0 +1,47 @@
+# Python virtual environments
+env/
+venv/
+.venv/
+venv_training/
+
+# Environment variable files
+.env
+.env.*
+
+# Ignore image assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.bmp
+*.tif
+*.tiff
+*.svg
+*.ico
+
+# Ignore Markdown files
+*.md
+
+# Ignore JSON labels only in train and test splits
+data/train/*.json
+data/test/*.json
+data/val/*.json
+
+# Python cache and bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Local databases and logs
+*.db
+logs/
+
+# Local editor settings
+.vscode/
+
+# Local Python bootstrap/install artifacts
+python311_embed/
+python-*.exe
+python-*.zip
+get-pip.py

@@ -1,9 +1,9 @@
 """
 Seed script to populate the local database with sample products for testing.
-Run with: python -m app.seed
+Run with: python -m backend.app.seed
 """
-from app.database import SessionLocal, Base, engine
-from app.models import Seller, Product
+from .database import SessionLocal, Base, engine
+from .models import Seller, Product
 from datetime import datetime, timezone
 
 

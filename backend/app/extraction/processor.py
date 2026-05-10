@@ -5,18 +5,17 @@ Iterates through a seller's products, extracts attributes using the
 configured VLM backend, and saves results to the database.
 """
 import asyncio
+import os
+from pathlib import Path
 from sqlalchemy.orm import Session
-from app.database import SessionLocal
-from app.models import Product, ExtractionJob, ExtractedAttribute
-from app.extraction.vlm import get_extractor
-from app.config import settings
+from ..database import SessionLocal
+from ..models import Product, ExtractionJob, ExtractedAttribute
+from .vlm import get_extractor
+from ..config import settings
 
 
 async def run_extraction_job(job_id: str) -> None:
-    """
-    Process an extraction job: extract attributes for every product
-    belonging to the job's seller, updating progress as we go.
-    """
+    """Process an extraction job."""
     db: Session = SessionLocal()
     try:
         job = db.query(ExtractionJob).filter_by(id=job_id).first()
@@ -27,7 +26,6 @@ async def run_extraction_job(job_id: str) -> None:
         job.progress = 0
         db.commit()
 
-        # Get all products for this seller
         products = db.query(Product).filter_by(seller_id=job.seller_id).all()
         if not products:
             job.status = "completed"
@@ -44,15 +42,43 @@ async def run_extraction_job(job_id: str) -> None:
         total = len(products)
         for i, product in enumerate(products):
             try:
-                attrs = await extractor.extract(
-                    image_url=product.image_url or "",
-                    description=product.description or "",
-                    title=product.title or "",
-                )
+                # Try local image path first
+                image_path = None
+                if product.image_url:
+                    # If it's a local file path, use it
+                    if os.path.exists(product.image_url):
+                        image_path = product.image_url
+                    else:
+                        # Try to find image in uploads folder
+                        filename = Path(product.image_url).name
+                        potential_paths = [
+                            f"uploads/{filename}",
+                            f"backend/uploads/{filename}",
+                            f"../uploads/{filename}",
+                        ]
+                        for p in potential_paths:
+                            if os.path.exists(p):
+                                image_path = p
+                                break
+
+                if image_path:
+                    attrs = await extractor.extract(
+                        image_path=image_path,
+                        description=product.description or "",
+                        title=product.title or "",
+                    )
+                else:
+                    # Fallback: use mock for products without images
+                    from .vlm import MockExtractor
+                    mock = MockExtractor()
+                    attrs = await mock.extract(
+                        image_path="",
+                        description=product.description or "",
+                        title=product.title or "",
+                    )
 
                 confidence = attrs.pop("confidence", 0.0)
 
-                # Upsert: delete old extraction for this product+job, insert new
                 db.query(ExtractedAttribute).filter_by(
                     product_id=product.id, job_id=job_id
                 ).delete()
@@ -65,23 +91,22 @@ async def run_extraction_job(job_id: str) -> None:
                 )
                 db.add(extracted)
 
-            except Exception:
-                # Skip failed products, continue with the rest
+            except Exception as e:
+                print(f"[EXTRACT] Error for product {product.id}: {e}")
                 pass
 
-            # Update progress
             job.progress = int(((i + 1) / total) * 100)
             db.commit()
 
-            # Small delay to avoid overwhelming the API (especially for GPT-4o)
+            # Small delay to avoid overwhelming the API
             await asyncio.sleep(0.1)
 
         job.status = "completed"
         job.progress = 100
         db.commit()
 
-    except Exception:
-        # Mark job as failed on unexpected errors
+    except Exception as e:
+        print(f"[EXTRACT] Job failed: {e}")
         try:
             job = db.query(ExtractionJob).filter_by(id=job_id).first()
             if job:

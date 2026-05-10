@@ -9,9 +9,9 @@ import uuid
 import asyncio
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app.models import Seller, ExtractionJob, ExtractedAttribute
-from app.extraction.processor import run_extraction_job
+from ..database import get_db
+from ..models import Seller, ExtractionJob, ExtractedAttribute
+from ..extraction.processor import run_extraction_job
 
 router = APIRouter()
 
@@ -78,7 +78,7 @@ async def get_extracted_attributes(seller_id: int, db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="Seller not found.")
 
     # Get the latest extraction for each product
-    from app.models import Product
+    from ..models import Product
     products = db.query(Product).filter_by(seller_id=seller.id).all()
     product_ids = [p.id for p in products]
 
