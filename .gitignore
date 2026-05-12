@@ -22,6 +22,9 @@ target/
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
+*.tmp
 
 # Build artifacts
 dist/
