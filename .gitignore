@@ -1,7 +1,4 @@
 ```
-# Database
-*.db
-
 # Dependencies
 node_modules/
 venv/
@@ -11,6 +8,11 @@ __pycache__/
 .pytest_cache/
 target/
 .gradle/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
 
 # Environment
 .env
@@ -24,44 +26,27 @@ target/
 *.swo
 *.tmp
 
-# Python
-*.pyc
-*.pyo
-*.pyd
-*.pyw
-.Python
-env/
-.ENV
-.python-version
-*.egg
-*.egg-info/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-python311_embed/
-python3*/
-
 # Build artifacts
 dist/
 build/
+*.pyc
 *.class
 *.o
+*.exe
+*.dll
+*.so
+*.a
 *.obj
 *.out
-.coverage
-htmlcov/
-.coverage.*
-.nyc_output/
-coverage-final.json
+
+# System files
+.DS_Store
+Thumbs.db
 
 # Coverage
 coverage/
-
-# Logs
-*.log
-events.out.tfevents.*
-runs/
-tensorboard/
+htmlcov/
+.coverage
 
 # Compressed files
 *.zip
@@ -82,24 +67,4 @@ tensorboard/
 *.Z
 *.lz
 *.lzo
-
-# Markdown files
-*.md
-
-# Data files
-data/test/*.json
-data/train/*.json
-data/val/*.json
-
-# Image files
-*.jpg
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
 ```
